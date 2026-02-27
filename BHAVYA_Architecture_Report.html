@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BHAVYA Architecture Report</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+        :root {
+            --primary: #6366f1;
+            --text-main: #1e293b;
+            --text-secondary: #64748b;
+            --bg: #ffffff;
+            --code-bg: #f1f5f9;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--text-main);
+            background: var(--bg);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            color: #0f172a;
+        }
+
+        h3 {
+            font-size: 1.4rem;
+            margin-top: 30px;
+            color: #334155;
+        }
+
+        p {
+            margin-bottom: 1.2rem;
+            color: #475569;
+        }
+
+        ul {
+            margin-bottom: 1.5rem;
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        strong {
+            color: #0f172a;
+        }
+
+        code {
+            background-color: var(--code-bg);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+            font-size: 0.9em;
+            color: #ef4444;
+        }
+
+        pre {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-size: 0.9rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.95rem;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background-color: #f8fafc;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .diagram {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            font-family: monospace;
+            white-space: pre;
+            overflow-x: auto;
+        }
+
+        @media print {
+            body {
+                max-width: 100%;
+                padding: 20px;
+            }
+
+            h1 {
+                color: #000;
+            }
+
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="no-print"
+        style="background: #e0e7ff; color: #3730a3; padding: 15px; border-radius: 8px; margin-bottom: 30px; text-align: center;">
+        <strong>Recommendation:</strong> Use your browser's "Print" function (Ctrl+P) and select "Save as PDF" to
+        generate a high-quality PDF report.
+    </div>
+
+    <h1>BHAVYA: Advanced Wellness & Affective Computing Platform</h1>
+    <p style="font-size: 1.1rem; color: #64748b;">Technical Architecture & Implementation Report</p>
+
+    <h2>1. Problem Statement</h2>
+    <p><strong>The Silent Epidemic & The Monitoring Gap</strong></p>
+    <p>Mental health disorders, particularly depression and anxiety, are currently among the leading causes of
+        disability worldwide. Despite their prevalence, effective management is hindered by a critical
+        <strong>Monitoring Gap</strong>:</p>
+    <ul>
+        <li><strong>Sporadic Assessment</strong>: Clinical evaluations happen infrequently (weeks or months apart),
+            missing daily fluctuations in mood and behavior.</li>
+        <li><strong>Subjectivity</strong>: Self-reporting is often biased or dependent on the patient's state at the
+            exact moment of reporting.</li>
+        <li><strong>Lack of Integration</strong>: Biological, behavioral, and emotional data are rarely synthesized into
+            a single cohesive risk profile in real-time.</li>
+        <li><strong>Reactive vs. Proactive</strong>: Most systems wait for a crisis to occur rather than detecting early
+            warning signs of emotional volatility or depressive patterns.</li>
+    </ul>
+    <p><strong>The Challenge</strong>: To build a secure, privacy-preserving, and intelligent platform that can
+        continuously monitor emotional dynamics, detect subtle risk patterns using advanced AI, and provide actionable
+        wellness interventions.</p>
+
+    <h2>2. Proposed Solution: BHAVYA</h2>
+    <p><strong>BHAVYA (Bio-Behavioral Holistic Analysis & Wellness Yielding Architecture)</strong> is a comprehensive
+        wellness ecosystem designed to bridge the gap between daily life and clinical oversight.</p>
+
+    <h3>Key Value Propositions</h3>
+    <ul>
+        <li><strong>Affective Time-Series Engine</strong>: Utilizes Neural Processing Unit (NPU) accelerated deep
+            learning to map user inputs (text, video, questionnaire) into high-dimensional emotional vectors (EEV) and
+            analyze them over time.</li>
+        <li><strong>Temporal Dynamics Modeling</strong>: Instead of just detecting "Sadness", the system detects
+            <em>patterns</em> like "Emotional Volatility" or "Persistent Depressive Inertia" using LSTM networks.</li>
+        <li><strong>Holistic Risk Scoring</strong>: Combines psychometric data (check-ins), behavioral logs
+            (journaling), and AI inference into a unified Risk Index.</li>
+        <li><strong>Immersive User Experience</strong>: A "Calm Technology" design approach using glassmorphism and
+            smooth animations to reduce cognitive load and anxiety.</li>
+    </ul>
+
+    <h2>3. System Architecture</h2>
+    <p>The platform follows a modern <strong>Client-Server Micro-Modular Architecture</strong>.</p>
+
+    <h3>3.1 High-Level Architecture Diagram</h3>
+    <div class="diagram">
+        +-------------------------+ +-------------------------------+
+        | Let's React Client (SPA)| <-----> | FastAPI Gateway |
+            +-------------------------+ JSON +---------------+---------------+
+            | - Auth (JWT) | | | |
+            | - State (Hooks) | v v v
+            | - Charts (Recharts) | +-----------+ +-----------+ +-----------+
+            | - Motion (Framer) | | Auth | | Services | | Affective |
+            +-------------------------+ | Service | | (Journal, | | Engine AI |
+            +-----------+ | User) | +-----------+
+            +-----------+ |
+            | v
+            v +-----------+
+            +-----------+ | NPU Interface |
+            | SQL DB | | LSTM Model |
+            +-----------+ +---------------+
+    </div>
+
+    <h3>3.2 Component Breakdown</h3>
+    <p><strong>A. Frontend (Client-Side)</strong></p>
+    <ul>
+        <li><strong>Architecture</strong>: Single Page Application (SPA).</li>
+        <li><strong>State Management</strong>: React Hooks (local state) + Context API for Auth and Theme.</li>
+        <li><strong>Visualization</strong>: Real-time charting of emotional timelines using Recharts.</li>
+        <li><strong>Interaction</strong>: Modal-driven workflows (e.g., Daily Check-ins) ensuring context preservation.
+        </li>
+    </ul>
+
+    <p><strong>B. Backend (Server-Side)</strong></p>
+    <ul>
+        <li><strong>Architecture</strong>: Monolithic codebase structured with modular separation (Services Pattern).
+        </li>
+        <li><strong>API Design</strong>: RESTful standard with Pydantic schemas for strict data validation
+            (Request/Response Models).</li>
+        <li><strong>Scalability</strong>: Asynchronous endpoints (<code>async def</code>) for non-blocking I/O
+            operations.</li>
+    </ul>
+
+    <p><strong>C. The Affective Engine (Core Innovation)</strong></p>
+    <ul>
+        <li><strong>Vector Space</strong>: Maps inputs to a <strong>15-dimensional EEV (Ecological Emotion
+                Vector)</strong> space (e.g., Amusement, Anxiety, Contentment, etc.).</li>
+        <li><strong>NPU Interface</strong>: A dedicated hardware abstraction layer designed to offload vector extraction
+            to Neural Processing Units (simulations implemented for development).</li>
+        <li><strong>Temporal Model</strong>: An <strong>LSTM (Long Short-Term Memory)</strong> network takes a sequence
+            of emotion vectors (T=30) and classifies the <em>dynamics</em> of the user's state.</li>
+    </ul>
+
+    <h2>4. Technology Stack</h2>
+
+    <h3>Frontend</h3>
+    <table>
+        <tr>
+            <th>Component</th>
+            <th>Technology</th>
+            <th>Reasoning</th>
+        </tr>
+        <tr>
+            <td>Framework</td>
+            <td><strong>React 18 + Vite</strong></td>
+            <td>High performance, component reusability, extremely fast dev server.</td>
+        </tr>
+        <tr>
+            <td>Language</td>
+            <td><strong>TypeScript</strong></td>
+            <td>Strong typing prevents runtime errors in complex logic.</td>
+        </tr>
+        <tr>
+            <td>Styling</td>
+            <td><strong>Tailwind CSS</strong></td>
+            <td>Rapid UI development, consistency, built-in dark mode support.</td>
+        </tr>
+        <tr>
+            <td>Animation</td>
+            <td><strong>Framer Motion</strong></td>
+            <td>Physics-based animations for a "premium" feel.</td>
+        </tr>
+        <tr>
+            <td>Charting</td>
+            <td><strong>Recharts</strong></td>
+            <td>Declarative, composable D3-based charting for React.</td>
+        </tr>
+    </table>
+
+    <h3>Backend</h3>
+    <table>
+        <tr>
+            <th>Component</th>
+            <th>Technology</th>
+            <th>Reasoning</th>
+        </tr>
+        <tr>
+            <td>Framework</td>
+            <td><strong>FastAPI</strong></td>
+            <td>Fastest Python web framework, native async support, auto-generated docs.</td>
+        </tr>
+        <tr>
+            <td>Language</td>
+            <td><strong>Python 3.9+</strong></td>
+            <td>Dominant language for AI/ML integration.</td>
+        </tr>
+        <tr>
+            <td>ORM</td>
+            <td><strong>SQLAlchemy 2.0</strong></td>
+            <td>Robust SQL abstraction and schema management.</td>
+        </tr>
+        <tr>
+            <td>Validation</td>
+            <td><strong>Pydantic v2</strong></td>
+            <td>Extremely fast data validation and serialization.</td>
+        </tr>
+    </table>
+
+    <h3>AI & Data Science</h3>
+    <table>
+        <tr>
+            <th>Component</th>
+            <th>Technology</th>
+            <th>Reasoning</th>
+        </tr>
+        <tr>
+            <td>Deep Learning</td>
+            <td><strong>PyTorch</strong></td>
+            <td>Dynamic graph generation, excellent for RNN/LSTM models.</td>
+        </tr>
+        <tr>
+            <td>Numerical</td>
+            <td><strong>NumPy</strong></td>
+            <td>High-performance vector/matrix operations.</td>
+        </tr>
+        <tr>
+            <td>Inference</td>
+            <td><strong>Custom NPU Interface</strong></td>
+            <td>Simulates hardware-accelerated edge inference for low-latency processing.</td>
+        </tr>
+    </table>
+
+    <h2>5. Approach & Methodologies</h2>
+    <ul>
+        <li><strong>Service-Oriented Logic</strong>: Business logic involves segregating API routes from core domain
+            logic. The <code>services/</code> directory contains the core logic (e.g., <code>affective_engine/</code>,
+            <code>optimization/</code>), while <code>app/api/</code> handles request/response processing.</li>
+        <li><strong>Type Safety & Validation</strong>: Strict typing is enforced across the full stack. Pydantic models
+            in Python mirror TypeScript interfaces in the frontend, ensuring data consistency (e.g.,
+            <code>UserCreate</code>, <code>DailyCheckIn</code>).</li>
+        <li><strong>Test-Driven Development (TDD) Hybrid</strong>: Critical paths (Affective Analysis, Check-in Logic)
+            are tested via unit scripts (e.g., <code>test_affective_api.py</code>) to ensure stability before UI
+            integration.</li>
+        <li><strong>Error Handling</strong>: Global exception handlers in FastAPI ensure that server-side errors (500s)
+            provide structured error logs without crashing the service, while the frontend implements boundaries to
+            degrade gracefully.</li>
+    </ul>
+
+    <div style="margin-top: 50px; text-align: center; color: #94a3b8; font-size: 0.9rem;">
+        Generated for BHAVYA Project Documentation • 2026
+    </div>
+
+</body>
+
+</html>

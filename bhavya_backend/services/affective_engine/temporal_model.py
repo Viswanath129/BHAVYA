@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import numpy as np
 
 class EEVTemporalModel(nn.Module):
     def __init__(self, input_dim=15, hidden_dim=64, num_layers=2, num_classes=4):
@@ -34,6 +35,28 @@ class EEVTemporalModel(nn.Module):
         logits = self.fc(last_step)
         probs = self.softmax(logits)
         return probs
+
+    def predict_from_vector(self, base_vector, seq_len=30):
+        """
+        Generates a temporal sequence from a static EEV vector and performs inference.
+        Useful for mapping questionnaire/static states to temporal dynamics.
+        """
+        sequence = []
+        for _ in range(seq_len):
+            # Simulate micro-fluctuations (Mental State Persistence)
+            noise = np.random.normal(0, 0.02, 15)
+            frame_vec = np.clip(base_vector + noise, 0, 1)
+            if frame_vec.sum() > 0:
+                frame_vec /= frame_vec.sum()
+            sequence.append(frame_vec)
+
+        sequence_np = np.array(sequence).astype(np.float32)
+        tensor_input = torch.tensor(sequence_np).unsqueeze(0) # (1, seq_len, 15)
+
+        with torch.no_grad():
+            probs = self.forward(tensor_input)
+
+        return probs, sequence_np
 
 class AffectiveRiskScorer:
     @staticmethod

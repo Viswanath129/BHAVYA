@@ -56,21 +56,8 @@ def create_checkin(
     ]
     base_vector = npu.process_question_answers(answers)
 
-    # 2. Simulate Temporal Persistence
-    seq_len = 30
-    sequence = []
-    for _ in range(seq_len):
-        noise = np.random.normal(0, 0.02, 15)
-        frame_vec = np.clip(base_vector + noise, 0, 1)
-        frame_vec /= frame_vec.sum()
-        sequence.append(frame_vec)
-    
-    sequence_np = np.array(sequence)
-
-    # 3. Model Inference
-    tensor_input = torch.tensor(sequence_np, dtype=torch.float32).unsqueeze(0)
-    with torch.no_grad():
-        probs = model(tensor_input)
+    # 2. Model Inference via Temporal Engine
+    probs, sequence_np = model.predict_from_vector(base_vector)
     
     pattern_idx = torch.argmax(probs).item()
     patterns = ["Stable", "Volatile", "Depressive", "Anxious"]
@@ -90,7 +77,7 @@ def create_checkin(
             "risk_score": float(risk_score),
             "source": "daily_checkin_advanced"
         },
-        timestamp=datetime.now()
+        generated_at=datetime.now()
     )
     db.add(new_insight)
     db.commit()

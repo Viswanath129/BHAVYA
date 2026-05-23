@@ -3,11 +3,20 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from typing import List, Optional
 from datetime import datetime, date
+import logging
 from app.api import deps
 from app.db import models
 from app import schemas
+from services.affective_engine.temporal_model import EEVTemporalModel
+from services.affective_engine.npu_interface import NPUInterface
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
+
+# Initialize Engines
+npu_engine = NPUInterface()
+temporal_model = EEVTemporalModel()
+temporal_model.eval()
 
 @router.post("/", response_model=schemas.DailyCheckIn)
 def create_checkin(
@@ -37,63 +46,40 @@ def create_checkin(
     db.refresh(db_checkin)
     
     # --- ADVANCED AFFECTIVE ALGO INTEGRATION ---
-    import numpy as np
-    import torch
-    from services.affective_engine.temporal_model import EEVTemporalModel, AffectiveRiskScorer
-    from services.affective_engine.npu_interface import NPUInterface
+    try:
+        # 1. Map to EEV Vector
+        answers = [
+            checkin.q_sleep_issue, checkin.q_energy, checkin.q_interest,
+            checkin.q_focus, checkin.q_anxiety, checkin.q_social,
+            checkin.q_routine, checkin.q_phone, checkin.q_motivation,
+            checkin.q_overwhelm
+        ]
+        base_vector = npu_engine.process_question_answers(answers)
 
-    # Initialize Engines (lazy load or module level)
-    npu = NPUInterface()
-    model = EEVTemporalModel()
-    model.eval()
+        # 2. Centralized Model Inference & Risk Calculation
+        analysis = temporal_model.predict_from_vector(base_vector)
 
-    # 1. Map to EEV Vector
-    answers = [
-        checkin.q_sleep_issue, checkin.q_energy, checkin.q_interest, 
-        checkin.q_focus, checkin.q_anxiety, checkin.q_social, 
-        checkin.q_routine, checkin.q_phone, checkin.q_motivation, 
-        checkin.q_overwhelm
-    ]
-    base_vector = npu.process_question_answers(answers)
+        detected_pattern = analysis["pattern"]
+        risk_score = analysis["risk_score"]
 
-    # 2. Simulate Temporal Persistence
-    seq_len = 30
-    sequence = []
-    for _ in range(seq_len):
-        noise = np.random.normal(0, 0.02, 15)
-        frame_vec = np.clip(base_vector + noise, 0, 1)
-        frame_vec /= frame_vec.sum()
-        sequence.append(frame_vec)
-    
-    sequence_np = np.array(sequence)
+        logger.info(f"User {current_user.id} Affective Analysis: {detected_pattern} (Risk: {risk_score:.2f})")
 
-    # 3. Model Inference
-    tensor_input = torch.tensor(sequence_np, dtype=torch.float32).unsqueeze(0)
-    with torch.no_grad():
-        probs = model(tensor_input)
-    
-    pattern_idx = torch.argmax(probs).item()
-    patterns = ["Stable", "Volatile", "Depressive", "Anxious"]
-    detected_pattern = patterns[pattern_idx]
-
-    # 4. Risk Scoring
-    risk_score = AffectiveRiskScorer.calculate_risk(sequence_np)
-    
-    print(f"User {current_user.id} Affective Analysis: {detected_pattern} (Risk: {risk_score:.2f})")
-    
-    # Save as Insight
-    new_insight = models.Insight(
-        user_id=current_user.id,
-        text=f"Affective Analysis: {detected_pattern} Pattern detected with Risk Level {risk_score:.2f}.",
-        related_features={
-            "pattern": detected_pattern,
-            "risk_score": float(risk_score),
-            "source": "daily_checkin_advanced"
-        },
+        # Save as Insight
+        new_insight = models.Insight(
+            user_id=current_user.id,
+            text=f"Affective Analysis: {detected_pattern} Pattern detected with Risk Level {risk_score:.2f}.",
+            related_features={
+                "pattern": detected_pattern,
+                "risk_score": float(risk_score),
+                "source": "daily_checkin_advanced"
+            },
         timestamp=datetime.now()
-    )
-    db.add(new_insight)
-    db.commit()
+        )
+        db.add(new_insight)
+        db.commit()
+    except Exception as e:
+        logger.error(f"Failed to process affective analysis for user {current_user.id}: {e}", exc_info=True)
+        # We don't fail the check-in if analysis fails, just log it
     
     return db_checkin
 

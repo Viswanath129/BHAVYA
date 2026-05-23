@@ -2,15 +2,24 @@ import pandas as pd
 import numpy as np
 import os
 from datetime import datetime
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def build_features(data_dir="data/studentlife"):
-    print("Building BHAVYA Features...")
+    logger.info("Building BHAVYA Features...")
     
     # Load Raw Data
-    sleep = pd.read_csv(os.path.join(data_dir, "sleep.csv"))
-    activity = pd.read_csv(os.path.join(data_dir, "activity.csv"))
-    gps = pd.read_csv(os.path.join(data_dir, "gps.csv"))
-    survey = pd.read_csv(os.path.join(data_dir, "survey.csv"))
+    sleep_path = os.path.join(data_dir, "sleep.csv")
+    activity_path = os.path.join(data_dir, "activity.csv")
+    gps_path = os.path.join(data_dir, "gps.csv")
+    survey_path = os.path.join(data_dir, "survey.csv")
+
+    sleep = pd.read_csv(sleep_path)
+    activity = pd.read_csv(activity_path)
+    gps = pd.read_csv(gps_path)
+    survey = pd.read_csv(survey_path)
     
     # 1. Process Sleep
     # Already has duration. We need midpoint.
@@ -82,8 +91,8 @@ def build_features(data_dir="data/studentlife"):
     
     # Save
     features.to_csv("bhavya_features.csv", index=False)
-    print(" - bhavya_features.csv created with columns:", list(features.columns))
-    print(features.head())
+    logger.info(f" - bhavya_features.csv created with columns: {list(features.columns)}")
+    logger.info(f"\n{features.head()}")
 
 if __name__ == "__main__":
     build_features()

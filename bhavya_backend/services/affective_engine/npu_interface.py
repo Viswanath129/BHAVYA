@@ -1,5 +1,8 @@
 import torch
 import numpy as np
+import logging
+
+logger = logging.getLogger(__name__)
 
 class NPUInterface:
     def __init__(self, model_path="npu_emotion_cnn.dlc"):
@@ -9,7 +12,7 @@ class NPUInterface:
         Here, we use a lightweight CPU surrogate to emulate the 15-dim vector output.
         """
         self.model_path = model_path
-        print(f"[NPU] Initializing Emotion CNN from {model_path} on Neural Processing Unit...")
+        logger.info(f"[NPU] Initializing Emotion CNN from {model_path} on Neural Processing Unit...")
         # Placeholder for actual SNPE runtime initialization
         self.ready = True
 

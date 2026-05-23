@@ -1,7 +1,8 @@
 import requests
 import json
 
-BASE_URL = "http://localhost:8000/api/v1"
+BASE_URL = "http://localhost:8000"
+API_V1_URL = f"{BASE_URL}/api/v1"
 
 def test_checkin():
     # 0. Signup (just in case)
@@ -10,7 +11,7 @@ def test_checkin():
         "email": "newuser@example.com",
         "password": "password123"
     }
-    signup_response = requests.post(f"{BASE_URL}/auth/signup", json=signup_data)
+    signup_response = requests.post(f"{API_V1_URL}/auth/signup", json=signup_data)
     if signup_response.status_code == 200 or signup_response.status_code == 400:
         print(f"Signup: {signup_response.status_code}")
     else:
@@ -22,8 +23,8 @@ def test_checkin():
         "password": "password123"
     }
     try:
-        print(f"Attempting login to {BASE_URL}/auth/token")
-        response = requests.post(f"{BASE_URL}/auth/token", data=login_data)
+        print(f"Attempting login to {API_V1_URL}/auth/token")
+        response = requests.post(f"{API_V1_URL}/auth/token", data=login_data)
         if response.status_code != 200:
             print(f"Login failed: {response.status_code}")
             print(f"Response: {response.text}")
@@ -46,7 +47,8 @@ def test_checkin():
             "q_overwhelm": 2
         }
         
-        checkin_response = requests.post(f"{BASE_URL}/checkin/", json=payload, headers=headers)
+        # Note: Check-in router is NOT under /api/v1 in main.py
+        checkin_response = requests.post(f"{BASE_URL}/api/checkin/", json=payload, headers=headers)
         
         if checkin_response.status_code == 200:
             print("Check-in successful!")

@@ -1,11 +1,11 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from pydantic import BaseModel
 from typing import List
-import numpy as np
-import torch
-from services.affective_engine.temporal_model import EEVTemporalModel, AffectiveRiskScorer
+import logging
+from services.affective_engine.temporal_model import EEVTemporalModel
 from services.affective_engine.npu_interface import NPUInterface
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
 
 # Initialize Engines
@@ -21,48 +21,19 @@ async def analyze_questions(data: QuestionInput):
     """
     Analyzes mental state based on questionnaire answers mapped to EEV Emotion Space.
     1. Answers -> NPU Interface (Vector Mapping)
-    2. Sequence Generation (Simulated temporal aspect from static answers)
-    3. Temporal Model Inference
+    2. Temporal Model Inference (via centralized predict_from_vector)
     """
     try:
         # 1. Map to 15-dim vector
         base_vector = npu_engine.process_question_answers(data.answers)
         
-        # 2. Simulate a "Time Series" from this state (Mental State Persistence)
-        # We create a sequence of 30 "frames" (seconds) where this mood persists but fluctuates slightly
-        seq_len = 30
-        sequence = []
-        for _ in range(seq_len):
-            noise = np.random.normal(0, 0.02, 15)
-            frame_vec = np.clip(base_vector + noise, 0, 1)
-            frame_vec /= frame_vec.sum()
-            sequence.append(frame_vec)
+        # 2. Centralized Model Inference & Risk Calculation
+        result = temporal_model.predict_from_vector(base_vector)
         
-        sequence_np = np.array(sequence)
-        
-        # 3. Model Inference
-        tensor_input = torch.tensor(sequence_np, dtype=torch.float32).unsqueeze(0) # (1, 30, 15)
-        with torch.no_grad():
-            probs = temporal_model(tensor_input) # (1, 4)
-            
-        pattern_idx = torch.argmax(probs).item()
-        patterns = ["Stable", "Volatile", "Depressive", "Anxious"]
-        
-        # 4. Risk Calculation
-        risk_score = AffectiveRiskScorer.calculate_risk(sequence_np)
-        
-        return {
-            "pattern": patterns[pattern_idx],
-            "risk_score": float(risk_score),
-            "emotion_timeline": [
-                {"time": i, "positive": float(v[:6].sum()), "negative": float(v[11:].sum())} 
-                for i, v in enumerate(sequence_np)
-            ]
-        }
+        return result
     except Exception as e:
-        import traceback
-        traceback.print_exc()
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Error in analyze_questions: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal server error during affective analysis")
 
 @router.post("/analyze/video")
 async def analyze_video(file: UploadFile = File(...)):

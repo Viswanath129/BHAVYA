@@ -1,5 +1,9 @@
 import torch
 import torch.nn as nn
+import numpy as np
+import logging
+
+logger = logging.getLogger(__name__)
 
 class EEVTemporalModel(nn.Module):
     def __init__(self, input_dim=15, hidden_dim=64, num_layers=2, num_classes=4):
@@ -34,6 +38,45 @@ class EEVTemporalModel(nn.Module):
         logits = self.fc(last_step)
         probs = self.softmax(logits)
         return probs
+
+    def predict_from_vector(self, base_vector: np.ndarray, seq_len: int = 30):
+        """
+        Analyzes mental state based on a base emotion vector by simulating temporal persistence.
+        """
+        try:
+            # 1. Simulate a "Time Series" (Mental State Persistence)
+            sequence = []
+            for _ in range(seq_len):
+                noise = np.random.normal(0, 0.02, 15)
+                frame_vec = np.clip(base_vector + noise, 0, 1)
+                frame_vec /= (frame_vec.sum() + 1e-9)
+                sequence.append(frame_vec)
+
+            sequence_np = np.array(sequence)
+
+            # 2. Model Inference
+            tensor_input = torch.tensor(sequence_np, dtype=torch.float32).unsqueeze(0) # (1, seq_len, 15)
+            self.eval()
+            with torch.no_grad():
+                probs = self.forward(tensor_input)
+
+            pattern_idx = torch.argmax(probs).item()
+            patterns = ["Stable", "Volatile", "Depressive", "Anxious"]
+
+            # 3. Risk Calculation
+            risk_score = AffectiveRiskScorer.calculate_risk(sequence_np)
+
+            return {
+                "pattern": patterns[pattern_idx],
+                "risk_score": float(risk_score),
+                "emotion_timeline": [
+                    {"time": i, "positive": float(v[:6].sum()), "negative": float(v[11:].sum())}
+                    for i, v in enumerate(sequence_np)
+                ]
+            }
+        except Exception as e:
+            logger.error(f"Error in predict_from_vector: {e}", exc_info=True)
+            raise
 
 class AffectiveRiskScorer:
     @staticmethod

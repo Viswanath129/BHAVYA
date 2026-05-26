@@ -6,8 +6,15 @@ from datetime import datetime, date
 from app.api import deps
 from app.db import models
 from app import schemas
+from services.affective_engine.temporal_model import EEVTemporalModel, AffectiveRiskScorer
+from services.affective_engine.npu_interface import NPUInterface
 
 router = APIRouter()
+
+# Initialize Engines
+npu = NPUInterface()
+model = EEVTemporalModel()
+model.eval()
 
 @router.post("/", response_model=schemas.DailyCheckIn)
 def create_checkin(
@@ -37,15 +44,6 @@ def create_checkin(
     db.refresh(db_checkin)
     
     # --- ADVANCED AFFECTIVE ALGO INTEGRATION ---
-    import numpy as np
-    import torch
-    from services.affective_engine.temporal_model import EEVTemporalModel, AffectiveRiskScorer
-    from services.affective_engine.npu_interface import NPUInterface
-
-    # Initialize Engines (lazy load or module level)
-    npu = NPUInterface()
-    model = EEVTemporalModel()
-    model.eval()
 
     # 1. Map to EEV Vector
     answers = [
@@ -56,28 +54,10 @@ def create_checkin(
     ]
     base_vector = npu.process_question_answers(answers)
 
-    # 2. Simulate Temporal Persistence
-    seq_len = 30
-    sequence = []
-    for _ in range(seq_len):
-        noise = np.random.normal(0, 0.02, 15)
-        frame_vec = np.clip(base_vector + noise, 0, 1)
-        frame_vec /= frame_vec.sum()
-        sequence.append(frame_vec)
-    
-    sequence_np = np.array(sequence)
-
-    # 3. Model Inference
-    tensor_input = torch.tensor(sequence_np, dtype=torch.float32).unsqueeze(0)
-    with torch.no_grad():
-        probs = model(tensor_input)
-    
-    pattern_idx = torch.argmax(probs).item()
-    patterns = ["Stable", "Volatile", "Depressive", "Anxious"]
-    detected_pattern = patterns[pattern_idx]
-
-    # 4. Risk Scoring
-    risk_score = AffectiveRiskScorer.calculate_risk(sequence_np)
+    # 2. Centralized Model Inference
+    result = model.predict_from_vector(base_vector)
+    detected_pattern = result["pattern"]
+    risk_score = result["risk_score"]
     
     print(f"User {current_user.id} Affective Analysis: {detected_pattern} (Risk: {risk_score:.2f})")
     

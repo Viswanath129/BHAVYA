@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import numpy as np
 
 class EEVTemporalModel(nn.Module):
     def __init__(self, input_dim=15, hidden_dim=64, num_layers=2, num_classes=4):
@@ -34,6 +35,41 @@ class EEVTemporalModel(nn.Module):
         logits = self.fc(last_step)
         probs = self.softmax(logits)
         return probs
+
+    def predict_from_vector(self, base_vector, seq_len=30):
+        """
+        Simulates temporal persistence from a single vector and runs inference.
+        """
+        # 1. Simulate Temporal Persistence
+        sequence = []
+        for _ in range(seq_len):
+            noise = np.random.normal(0, 0.02, 15)
+            frame_vec = np.clip(base_vector + noise, 0, 1)
+            # Avoid division by zero if all elements are 0
+            vec_sum = frame_vec.sum()
+            if vec_sum > 0:
+                frame_vec /= vec_sum
+            sequence.append(frame_vec)
+
+        sequence_np = np.array(sequence)
+
+        # 2. Model Inference
+        tensor_input = torch.tensor(sequence_np, dtype=torch.float32).unsqueeze(0)
+        with torch.no_grad():
+            probs = self.forward(tensor_input)
+
+        pattern_idx = torch.argmax(probs).item()
+        patterns = ["Stable", "Volatile", "Depressive", "Anxious"]
+        detected_pattern = patterns[pattern_idx]
+
+        # 3. Risk Scoring
+        risk_score = AffectiveRiskScorer.calculate_risk(sequence_np)
+
+        return {
+            "pattern": detected_pattern,
+            "risk_score": float(risk_score),
+            "sequence": sequence_np
+        }
 
 class AffectiveRiskScorer:
     @staticmethod

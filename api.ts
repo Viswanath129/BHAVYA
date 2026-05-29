@@ -142,23 +142,6 @@ export const api = {
 
     // Affective Engine
     analyzeAffective: async (answers: number[]) => {
-        const token = getToken();
-        // Note: The affective router was mounted at /api/affective, NOT /api/v1/affective
-        // So we construct the URL manually or adjust the prefix. 
-        // Let's assume consistent prefixing: I mounted it at /api/affective in main.py.
-        // The API_URL is http://localhost:8000/api/v1
-        // So we need to strip 'v1' or just use absolute path.
-        const baseUrl = API_URL.replace('/v1', '');
-
-        const response = await fetch(`${baseUrl}/affective/analyze/questions`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ answers }),
-        });
-        if (!response.ok) throw new Error('Analysis Failed');
-        return response.json();
+        return api.post('/affective/analyze/questions', { answers });
     }
 };

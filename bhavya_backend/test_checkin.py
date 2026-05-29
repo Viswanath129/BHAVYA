@@ -46,7 +46,10 @@ def test_checkin():
             "q_overwhelm": 2
         }
         
-        checkin_response = requests.post(f"{BASE_URL}/checkin/", json=payload, headers=headers)
+        # Check-in is currently NOT under API_V1_STR in main.py, it's at /api/checkin
+        # Base URL for non-v1 routes
+        CHECKIN_URL = BASE_URL.replace("/api/v1", "/api")
+        checkin_response = requests.post(f"{CHECKIN_URL}/checkin/", json=payload, headers=headers)
         
         if checkin_response.status_code == 200:
             print("Check-in successful!")

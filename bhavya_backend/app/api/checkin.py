@@ -89,8 +89,7 @@ def create_checkin(
             "pattern": detected_pattern,
             "risk_score": float(risk_score),
             "source": "daily_checkin_advanced"
-        },
-        timestamp=datetime.now()
+        }
     )
     db.add(new_insight)
     db.commit()

@@ -14,7 +14,10 @@ def seed():
         user = models.User(
             email="test@example.com",
             username="testuser",
-            hashed_password=get_password_hash("password123")
+            hashed_password=get_password_hash("password123"),
+            full_name="Test User",
+            bio="Mental health advocate and tech enthusiast.",
+            location="San Francisco, CA"
         )
         db.add(user)
         db.commit()

@@ -57,7 +57,7 @@ class Insight(BaseModel):
     id: int
     text: str
     related_features: Optional[Any] = None
-    generated_at: datetime
+    timestamp: datetime
     
     class Config:
         from_attributes = True

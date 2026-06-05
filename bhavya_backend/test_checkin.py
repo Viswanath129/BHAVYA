@@ -5,9 +5,11 @@ BASE_URL = "http://localhost:8000/api/v1"
 
 def test_checkin():
     # 0. Signup (just in case)
+    import time
+    ts = int(time.time())
     signup_data = {
-        "username": "newuser",
-        "email": "newuser@example.com",
+        "username": f"user_{ts}",
+        "email": f"user_{ts}@example.com",
         "password": "password123"
     }
     signup_response = requests.post(f"{BASE_URL}/auth/signup", json=signup_data)
@@ -18,7 +20,7 @@ def test_checkin():
 
     # 1. Login to get token
     login_data = {
-        "username": "newuser",
+        "username": f"user_{ts}",
         "password": "password123"
     }
     try:

@@ -1,7 +1,9 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
 from pydantic import BaseModel
 from typing import List
 import numpy as np
+from app.db import models
+from app.api import deps
 import torch
 from services.affective_engine.temporal_model import EEVTemporalModel, AffectiveRiskScorer
 from services.affective_engine.npu_interface import NPUInterface
@@ -17,7 +19,10 @@ class QuestionInput(BaseModel):
     answers: List[int] # 0-3 scale for 10 questions
 
 @router.post("/analyze/questions")
-async def analyze_questions(data: QuestionInput):
+async def analyze_questions(
+    data: QuestionInput,
+    current_user: models.User = Depends(deps.get_current_user)
+):
     """
     Analyzes mental state based on questionnaire answers mapped to EEV Emotion Space.
     1. Answers -> NPU Interface (Vector Mapping)

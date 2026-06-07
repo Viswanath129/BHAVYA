@@ -57,7 +57,7 @@ class Insight(BaseModel):
     id: int
     text: str
     related_features: Optional[Any] = None
-    generated_at: datetime
+    timestamp: datetime
     
     class Config:
         from_attributes = True
@@ -65,7 +65,6 @@ class Insight(BaseModel):
 # Dashboard
 class DashboardData(BaseModel):
     sleep_data: List[dict]
-    activity_data: List[dict]
     activity_data: List[dict]
     interaction_data: List[dict]
     future_risk: Optional[dict] = None

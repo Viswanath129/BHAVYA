@@ -1,4 +1,7 @@
+import logging
 from fastapi import APIRouter, UploadFile, File, HTTPException
+
+logger = logging.getLogger(__name__)
 from pydantic import BaseModel
 from typing import List
 import numpy as np
@@ -60,8 +63,7 @@ async def analyze_questions(data: QuestionInput):
             ]
         }
     except Exception as e:
-        import traceback
-        traceback.print_exc()
+        logger.exception("Error during affective analysis")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/analyze/video")

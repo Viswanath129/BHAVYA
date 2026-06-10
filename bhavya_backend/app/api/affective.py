@@ -1,12 +1,18 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
+import logging
 from pydantic import BaseModel
 from typing import List
 import numpy as np
 import torch
 from services.affective_engine.temporal_model import EEVTemporalModel, AffectiveRiskScorer
 from services.affective_engine.npu_interface import NPUInterface
+from app.api import deps
+from app.db import models
 
 router = APIRouter()
+
+# Initialize logger
+logger = logging.getLogger(__name__)
 
 # Initialize Engines
 npu_engine = NPUInterface()
@@ -17,7 +23,10 @@ class QuestionInput(BaseModel):
     answers: List[int] # 0-3 scale for 10 questions
 
 @router.post("/analyze/questions")
-async def analyze_questions(data: QuestionInput):
+async def analyze_questions(
+    data: QuestionInput,
+    current_user: models.User = Depends(deps.get_current_user)
+):
     """
     Analyzes mental state based on questionnaire answers mapped to EEV Emotion Space.
     1. Answers -> NPU Interface (Vector Mapping)
@@ -60,12 +69,14 @@ async def analyze_questions(data: QuestionInput):
             ]
         }
     except Exception as e:
-        import traceback
-        traceback.print_exc()
+        logger.exception("Error during questionnaire affective analysis")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/analyze/video")
-async def analyze_video(file: UploadFile = File(...)):
+async def analyze_video(
+    file: UploadFile = File(...),
+    current_user: models.User = Depends(deps.get_current_user)
+):
     """
     Placeholder for Video Analysis.
     In production:

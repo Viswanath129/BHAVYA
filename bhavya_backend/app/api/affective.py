@@ -1,12 +1,16 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
+import logging
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
 from pydantic import BaseModel
 from typing import List
 import numpy as np
 import torch
+from app.db import models
+from app.api import deps
 from services.affective_engine.temporal_model import EEVTemporalModel, AffectiveRiskScorer
 from services.affective_engine.npu_interface import NPUInterface
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 # Initialize Engines
 npu_engine = NPUInterface()
@@ -17,7 +21,10 @@ class QuestionInput(BaseModel):
     answers: List[int] # 0-3 scale for 10 questions
 
 @router.post("/analyze/questions")
-async def analyze_questions(data: QuestionInput):
+async def analyze_questions(
+    data: QuestionInput,
+    current_user: models.User = Depends(deps.get_current_user)
+):
     """
     Analyzes mental state based on questionnaire answers mapped to EEV Emotion Space.
     1. Answers -> NPU Interface (Vector Mapping)
@@ -51,6 +58,8 @@ async def analyze_questions(data: QuestionInput):
         # 4. Risk Calculation
         risk_score = AffectiveRiskScorer.calculate_risk(sequence_np)
         
+        logger.info(f"User {current_user.id} Affective Analysis: {patterns[pattern_idx]} (Risk: {risk_score:.2f})")
+
         return {
             "pattern": patterns[pattern_idx],
             "risk_score": float(risk_score),
@@ -60,9 +69,8 @@ async def analyze_questions(data: QuestionInput):
             ]
         }
     except Exception as e:
-        import traceback
-        traceback.print_exc()
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Error in affective analysis: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal server error during affective analysis")
 
 @router.post("/analyze/video")
 async def analyze_video(file: UploadFile = File(...)):

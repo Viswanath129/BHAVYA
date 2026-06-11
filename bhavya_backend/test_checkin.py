@@ -4,21 +4,9 @@ import json
 BASE_URL = "http://localhost:8000/api/v1"
 
 def test_checkin():
-    # 0. Signup (just in case)
-    signup_data = {
-        "username": "newuser",
-        "email": "newuser@example.com",
-        "password": "password123"
-    }
-    signup_response = requests.post(f"{BASE_URL}/auth/signup", json=signup_data)
-    if signup_response.status_code == 200 or signup_response.status_code == 400:
-        print(f"Signup: {signup_response.status_code}")
-    else:
-        print(f"Signup failed: {signup_response.text}")
-
     # 1. Login to get token
     login_data = {
-        "username": "newuser",
+        "username": "testuser",
         "password": "password123"
     }
     try:

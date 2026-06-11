@@ -1,3 +1,6 @@
+import logging
+import numpy as np
+import torch
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import func
@@ -6,8 +9,16 @@ from datetime import datetime, date
 from app.api import deps
 from app.db import models
 from app import schemas
+from services.affective_engine.temporal_model import EEVTemporalModel, AffectiveRiskScorer
+from services.affective_engine.npu_interface import NPUInterface
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
+
+# Initialize Engines
+npu = NPUInterface()
+model = EEVTemporalModel()
+model.eval()
 
 @router.post("/", response_model=schemas.DailyCheckIn)
 def create_checkin(
@@ -37,16 +48,6 @@ def create_checkin(
     db.refresh(db_checkin)
     
     # --- ADVANCED AFFECTIVE ALGO INTEGRATION ---
-    import numpy as np
-    import torch
-    from services.affective_engine.temporal_model import EEVTemporalModel, AffectiveRiskScorer
-    from services.affective_engine.npu_interface import NPUInterface
-
-    # Initialize Engines (lazy load or module level)
-    npu = NPUInterface()
-    model = EEVTemporalModel()
-    model.eval()
-
     # 1. Map to EEV Vector
     answers = [
         checkin.q_sleep_issue, checkin.q_energy, checkin.q_interest, 
@@ -79,7 +80,7 @@ def create_checkin(
     # 4. Risk Scoring
     risk_score = AffectiveRiskScorer.calculate_risk(sequence_np)
     
-    print(f"User {current_user.id} Affective Analysis: {detected_pattern} (Risk: {risk_score:.2f})")
+    logger.info(f"User {current_user.id} Affective Analysis: {detected_pattern} (Risk: {risk_score:.2f})")
     
     # Save as Insight
     new_insight = models.Insight(

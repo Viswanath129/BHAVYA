@@ -5,6 +5,9 @@ import numpy as np
 import torch
 from services.affective_engine.temporal_model import EEVTemporalModel, AffectiveRiskScorer
 from services.affective_engine.npu_interface import NPUInterface
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -60,8 +63,7 @@ async def analyze_questions(data: QuestionInput):
             ]
         }
     except Exception as e:
-        import traceback
-        traceback.print_exc()
+        logger.exception("Error during questionnaire analysis")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/analyze/video")

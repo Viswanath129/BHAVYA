@@ -86,7 +86,7 @@ class Insight(Base):
     user_id = Column(Integer, ForeignKey("users.id"))
     text = Column(Text)
     related_features = Column(JSON, nullable=True)
-    generated_at = Column(DateTime(timezone=True), server_default=func.now())
+    timestamp = Column(DateTime(timezone=True), server_default=func.now())
     is_read = Column(Boolean, default=False)
 
     user = relationship("User", back_populates="insights")

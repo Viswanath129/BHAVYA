@@ -1,7 +1,7 @@
 import requests
 import json
 
-url = "http://localhost:8000/api/affective/analyze/questions"
+url = "http://localhost:8000/api/v1/affective/analyze/questions"
 data = {"answers": [1, 2, 0, 1, 3, 2, 1, 0, 1, 2]}
 
 try:

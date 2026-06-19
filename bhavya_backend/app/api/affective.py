@@ -1,3 +1,4 @@
+import logging
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from pydantic import BaseModel
 from typing import List
@@ -7,6 +8,7 @@ from services.affective_engine.temporal_model import EEVTemporalModel, Affective
 from services.affective_engine.npu_interface import NPUInterface
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 # Initialize Engines
 npu_engine = NPUInterface()
@@ -60,8 +62,7 @@ async def analyze_questions(data: QuestionInput):
             ]
         }
     except Exception as e:
-        import traceback
-        traceback.print_exc()
+        logger.exception("Error during question analysis")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/analyze/video")

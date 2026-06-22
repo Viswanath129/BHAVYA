@@ -31,6 +31,23 @@ export const Journal: React.FC = () => {
     const [content, setContent] = useState("");
     const [entries, setEntries] = useState<any[]>([]);
 
+    const getMoodConfig = (mood: string) => {
+        switch (mood?.toLowerCase()) {
+            case 'joyful':
+                return { icon: 'sentiment_very_satisfied', color: 'text-yellow-400' };
+            case 'calm':
+                return { icon: 'sentiment_satisfied', color: 'text-emerald-400' };
+            case 'neutral':
+                return { icon: 'sentiment_neutral', color: 'text-slate-400' };
+            case 'low':
+                return { icon: 'sentiment_dissatisfied', color: 'text-blue-400' };
+            case 'anxious':
+                return { icon: 'sentiment_extremely_dissatisfied', color: 'text-purple-400' };
+            default:
+                return { icon: 'sentiment_satisfied', color: 'text-primary' };
+        }
+    };
+
     useEffect(() => {
         loadEntries();
     }, []);
@@ -119,16 +136,19 @@ export const Journal: React.FC = () => {
                 </div>
                 <div className="flex-1 overflow-y-auto p-4 space-y-4">
                     {/* Render Real Entries */}
-                    {entries.map((entry: any) => (
-                        <HistoryCard
-                            key={entry.id}
-                            date={new Date(entry.timestamp).toLocaleDateString()}
-                            title={entry.title || "Entry"}
-                            preview={entry.content}
-                            moodIcon="sentiment_satisfied"
-                            moodColor="text-primary"
-                        />
-                    ))}
+                    {entries.map((entry: any) => {
+                        const moodConfig = getMoodConfig(entry.mood);
+                        return (
+                            <HistoryCard
+                                key={entry.id}
+                                date={new Date(entry.timestamp).toLocaleDateString()}
+                                title={entry.title || "Entry"}
+                                preview={entry.content}
+                                moodIcon={moodConfig.icon}
+                                moodColor={moodConfig.color}
+                            />
+                        );
+                    })}
 
                     {entries.length === 0 && (
                         <div className="text-center text-slate-400 text-sm mt-10">No entries yet.</div>

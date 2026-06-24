@@ -1,3 +1,4 @@
+import logging
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import func
@@ -7,9 +8,10 @@ from app.api import deps
 from app.db import models
 from app import schemas
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
 
-@router.post("/", response_model=schemas.DailyCheckIn)
+@router.post("", response_model=schemas.DailyCheckIn)
 def create_checkin(
     checkin: schemas.DailyCheckInCreate,
     db: Session = Depends(deps.get_db),
@@ -79,7 +81,7 @@ def create_checkin(
     # 4. Risk Scoring
     risk_score = AffectiveRiskScorer.calculate_risk(sequence_np)
     
-    print(f"User {current_user.id} Affective Analysis: {detected_pattern} (Risk: {risk_score:.2f})")
+    logger.info(f"User {current_user.id} Affective Analysis: {detected_pattern} (Risk: {risk_score:.2f})")
     
     # Save as Insight
     new_insight = models.Insight(

@@ -1,3 +1,4 @@
+import logging
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from pydantic import BaseModel
 from typing import List
@@ -6,6 +7,7 @@ import torch
 from services.affective_engine.temporal_model import EEVTemporalModel, AffectiveRiskScorer
 from services.affective_engine.npu_interface import NPUInterface
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
 
 # Initialize Engines
@@ -60,8 +62,7 @@ async def analyze_questions(data: QuestionInput):
             ]
         }
     except Exception as e:
-        import traceback
-        traceback.print_exc()
+        logger.exception("Error during affective analysis")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/analyze/video")

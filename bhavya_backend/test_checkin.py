@@ -46,7 +46,7 @@ def test_checkin():
             "q_overwhelm": 2
         }
         
-        checkin_response = requests.post(f"{BASE_URL}/checkin/", json=payload, headers=headers)
+        checkin_response = requests.post(f"{BASE_URL}/checkin", json=payload, headers=headers)
         
         if checkin_response.status_code == 200:
             print("Check-in successful!")

@@ -7,7 +7,7 @@ from app import schemas
 
 router = APIRouter()
 
-@router.post("/", response_model=schemas.JournalEntry)
+@router.post("", response_model=schemas.JournalEntry)
 def create_journal_entry(
     entry: schemas.JournalEntryCreate,
     db: Session = Depends(deps.get_db),
@@ -24,7 +24,7 @@ def create_journal_entry(
     db.refresh(db_entry)
     return db_entry
 
-@router.get("/", response_model=List[schemas.JournalEntry])
+@router.get("", response_model=List[schemas.JournalEntry])
 def read_journal_entries(
     skip: int = 0,
     limit: int = 100,

@@ -66,7 +66,6 @@ class Insight(BaseModel):
 class DashboardData(BaseModel):
     sleep_data: List[dict]
     activity_data: List[dict]
-    activity_data: List[dict]
     interaction_data: List[dict]
     future_risk: Optional[dict] = None
 

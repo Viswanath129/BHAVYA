@@ -5,10 +5,11 @@ from app import schemas
 from app.db import models
 from app.db.base import get_db
 from app.api import deps
+from services.inference.predictor import predictor
 
 router = APIRouter()
 
-@router.get("/", response_model=List[schemas.Insight])
+@router.get("", response_model=List[schemas.Insight])
 def get_insights(
     skip: int = 0, 
     limit: int = 10, 
@@ -24,7 +25,6 @@ def get_dashboard_data(
     db: Session = Depends(get_db)
 ):
     # Fetch real risk assessment
-    from services.inference.predictor import predictor
     risk_assessment = predictor.predict_risk(current_user.id, db)
     
     # Mock data for charts (still mocked as we don't have full history visualization built yet)
@@ -70,7 +70,6 @@ def get_risk_insights(
     db: Session = Depends(get_db)
 ):
     # Connect to ML Model
-    from services.inference.predictor import predictor
     risk = predictor.predict_risk(current_user.id, db)
     
     factors = []

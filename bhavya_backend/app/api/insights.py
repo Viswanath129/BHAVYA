@@ -8,7 +8,7 @@ from app.api import deps
 
 router = APIRouter()
 
-@router.get("/", response_model=List[schemas.Insight])
+@router.get("", response_model=List[schemas.Insight])
 def get_insights(
     skip: int = 0, 
     limit: int = 10, 

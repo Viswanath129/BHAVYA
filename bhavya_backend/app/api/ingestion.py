@@ -5,6 +5,7 @@ from app.db import models
 from app.db.base import get_db
 from app.api import deps
 from datetime import datetime
+import logging
 
 router = APIRouter()
 
@@ -21,7 +22,7 @@ def process_ingestion_data(data: schemas.DataIngestion, user_id: int, db: Sessio
     )
     db.add(db_raw)
     db.commit()
-    print(f"Processed {data.data_type} for user {user_id}")
+    logging.info(f"Processed {data.data_type} for user {user_id}")
 
 @router.post("/ingest")
 def ingest_data(

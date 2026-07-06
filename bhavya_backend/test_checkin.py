@@ -6,8 +6,8 @@ BASE_URL = "http://localhost:8000/api/v1"
 def test_checkin():
     # 0. Signup (just in case)
     signup_data = {
-        "username": "newuser",
-        "email": "newuser@example.com",
+        "username": "newuser2",
+        "email": "newuser2@example.com",
         "password": "password123"
     }
     signup_response = requests.post(f"{BASE_URL}/auth/signup", json=signup_data)
@@ -18,7 +18,7 @@ def test_checkin():
 
     # 1. Login to get token
     login_data = {
-        "username": "newuser",
+        "username": "newuser2",
         "password": "password123"
     }
     try:
@@ -46,7 +46,7 @@ def test_checkin():
             "q_overwhelm": 2
         }
         
-        checkin_response = requests.post(f"{BASE_URL}/checkin/", json=payload, headers=headers)
+        checkin_response = requests.post(f"{BASE_URL}/checkin", json=payload, headers=headers)
         
         if checkin_response.status_code == 200:
             print("Check-in successful!")

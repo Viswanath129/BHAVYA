@@ -3,6 +3,9 @@ from pydantic import BaseModel
 from typing import List
 import numpy as np
 import torch
+import logging
+
+logger = logging.getLogger(__name__)
 from services.affective_engine.temporal_model import EEVTemporalModel, AffectiveRiskScorer
 from services.affective_engine.npu_interface import NPUInterface
 
@@ -60,8 +63,7 @@ async def analyze_questions(data: QuestionInput):
             ]
         }
     except Exception as e:
-        import traceback
-        traceback.print_exc()
+        logger.exception("Error during question analysis")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/analyze/video")

@@ -1,3 +1,4 @@
+import logging
 from fastapi import APIRouter, Depends, BackgroundTasks
 from sqlalchemy.orm import Session
 from app import schemas
@@ -21,7 +22,7 @@ def process_ingestion_data(data: schemas.DataIngestion, user_id: int, db: Sessio
     )
     db.add(db_raw)
     db.commit()
-    print(f"Processed {data.data_type} for user {user_id}")
+    logging.info(f"Processed {data.data_type} for user {user_id}")
 
 @router.post("/ingest")
 def ingest_data(

@@ -30,11 +30,11 @@ app.add_middleware(
 app.include_router(auth.router, prefix=f"{settings.API_V1_STR}/auth", tags=["auth"])
 app.include_router(users.router, prefix=f"{settings.API_V1_STR}/users", tags=["users"])
 app.include_router(ingestion.router, prefix=f"{settings.API_V1_STR}/ingestion", tags=["ingestion"])
-app.include_router(insights.router, prefix="/api/insights", tags=["insights"])
+app.include_router(insights.router, prefix=f"{settings.API_V1_STR}/insights", tags=["insights"])
 app.include_router(journal.router, prefix=f"{settings.API_V1_STR}/journal", tags=["journal"])
 app.include_router(chat.router, prefix=f"{settings.API_V1_STR}/chat", tags=["chat"])
-app.include_router(checkin.router, prefix="/api/checkin", tags=["checkin"])
-app.include_router(affective.router, prefix="/api/affective", tags=["affective"]) # New Affective Module
+app.include_router(checkin.router, prefix=f"{settings.API_V1_STR}/checkin", tags=["checkin"])
+app.include_router(affective.router, prefix=f"{settings.API_V1_STR}/affective", tags=["affective"])
 
 @app.get("/")
 def root():

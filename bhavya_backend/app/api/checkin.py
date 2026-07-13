@@ -9,7 +9,7 @@ from app import schemas
 
 router = APIRouter()
 
-@router.post("/", response_model=schemas.DailyCheckIn)
+@router.post("", response_model=schemas.DailyCheckIn)
 def create_checkin(
     checkin: schemas.DailyCheckInCreate,
     db: Session = Depends(deps.get_db),
@@ -90,7 +90,7 @@ def create_checkin(
             "risk_score": float(risk_score),
             "source": "daily_checkin_advanced"
         },
-        timestamp=datetime.now()
+        generated_at=datetime.now()
     )
     db.add(new_insight)
     db.commit()

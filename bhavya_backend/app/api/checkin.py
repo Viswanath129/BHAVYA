@@ -9,7 +9,7 @@ from app import schemas
 
 router = APIRouter()
 
-@router.post("/", response_model=schemas.DailyCheckIn)
+@router.post("", response_model=schemas.DailyCheckIn)
 def create_checkin(
     checkin: schemas.DailyCheckInCreate,
     db: Session = Depends(deps.get_db),
